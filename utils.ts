@@ -41,6 +41,26 @@ export function handlePasteScreenshot(callback: (file: File) => void) {
   return () => window.removeEventListener('paste', onPaste); // biar bisa cleanup
 }
 
+// cara pakai handlePasteScreenShot
+
+// useEffect(() => {
+//   const cleanup = handlePasteScreenshot((file) => {
+//     router.post(
+//       route('article.upload-media', article.id),
+//       {
+//         file,
+//       },
+//       {
+//         preserveScroll: true,
+//         onSuccess: () => toast.success('upload completed'),
+//         onError: (e) => toast.error(em(e)),
+//       },
+//     );
+//   });
+
+//   return cleanup;
+// }, [article.id]);
+
 export function copyMarkdownImage(alt: string, url: string) {
   const markdown = `![${alt}](${url})`;
 
