@@ -5,11 +5,12 @@ import { Label } from '@/components/ui/label';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import AppLayout from '@/layouts/app-layout';
 import { Snippet } from '@/types';
-import { Edit, Filter, Plus, Trash2 } from 'lucide-react';
+import { Link } from '@inertiajs/react';
+import { Edit, Filter, Folder, Plus, Trash2 } from 'lucide-react';
 import { FC, useState } from 'react';
-import SnippetDeleteDialog from './delete-dialog';
-import SnippetFilterSheet from './filter-sheet';
-import SnippetFormSheet from './form-sheet';
+import SnippetDeleteDialog from './components/snippet-delete-dialog';
+import SnippetFilterSheet from './components/snippet-filter-sheet';
+import SnippetFormSheet from './components/snippet-form-sheet';
 
 type Props = {
   snippets: Snippet[];
@@ -100,6 +101,11 @@ const SnippetList: FC<Props> = ({ snippets }) => {
                 </TableCell>
                 <TableCell>{snippet.name}</TableCell>
                 <TableCell>
+                  <Button variant={'ghost'} size={'icon'}>
+                    <Link href={route('snippet.show', snippet.id)}>
+                      <Folder />
+                    </Link>
+                  </Button>
                   <SnippetFormSheet purpose="edit" snippet={snippet}>
                     <Button variant={'ghost'} size={'icon'}>
                       <Edit />
