@@ -1,4 +1,4 @@
-import { Card, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import AppLayout from '@/layouts/app-layout';
 import { Snippet } from '@/types';
 import { FC } from 'react';
@@ -13,10 +13,10 @@ const showSnippet: FC<Props> = ({ snippet }) => {
       <Card>
         <CardHeader>
           <CardTitle>{snippet.name}</CardTitle>
-          <CardTitle>
+          <CardDescription>
             Lorem ipsum dolor sit amet consectetur adipisicing elit. Odio, quo impedit cupiditate voluptas culpa magnam itaque distinctio at ullam,
             beatae perferendis doloremque facilis mollitia, quod corporis. Autem voluptatum ipsum placeat.
-          </CardTitle>
+          </CardDescription>
         </CardHeader>
       </Card>
     </AppLayout>
