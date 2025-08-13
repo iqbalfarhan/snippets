@@ -61,6 +61,39 @@ export function handlePasteScreenshot(callback: (file: File) => void) {
 //   return cleanup;
 // }, [article.id]);
 
+export function generateSlug(text: string): string {
+  const slugBase = text.replace(/\//g, '');
+  return slugBase.toLowerCase().replace(/\s+/g, '-');
+}
+
+export function generatePassword(): string {
+  const letters = 'abcdefghijklmnopqrstuvwxyz';
+  const digits = '0123456789';
+
+  const randomChars = (charset: string, length: number): string => {
+    return Array.from({ length }, () => charset.charAt(Math.floor(Math.random() * charset.length))).join('');
+  };
+
+  const part1 = randomChars(letters, 4); // \w{4}
+  const part2 = randomChars(digits, 4); // \d{4}
+
+  return part1 + part2;
+}
+
+export function groupBy<T, K extends keyof T>(array: T[], key: K): Record<string, T[]> {
+  return array.reduce(
+    (acc, item) => {
+      const groupKey = String(item[key]);
+      if (!acc[groupKey]) {
+        acc[groupKey] = [];
+      }
+      acc[groupKey].push(item);
+      return acc;
+    },
+    {} as Record<string, T[]>,
+  );
+}
+
 export function copyMarkdownImage(alt: string, url: string) {
   const markdown = `![${alt}](${url})`;
 
@@ -68,4 +101,11 @@ export function copyMarkdownImage(alt: string, url: string) {
     .writeText(markdown)
     .then(() => toast.success(`${alt} copied to clipboard`))
     .catch((err) => toast.error(err));
+}
+
+export function capitalizeWords(str: string): string {
+  return str
+    .split(" ")
+    .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+    .join(" ");
 }
