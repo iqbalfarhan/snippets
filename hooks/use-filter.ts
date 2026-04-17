@@ -1,3 +1,4 @@
+import { flattenValues } from '@/lib/utils';
 import type { FilterConfig, FilterState } from '@/types';
 import { useMemo, useState } from 'react';
 
@@ -48,8 +49,8 @@ export function useFilter<T extends Record<string, any>>(
     return data.filter((item) => {
       const matchSearch =
         !search ||
-        Object.values(item).some((v) =>
-          String(v).toLowerCase().includes(search.toLowerCase()),
+        flattenValues(item).some((v) =>
+          v.toLowerCase().includes(search.toLowerCase()),
         );
 
       const matchFilters = activeConfigs.every((cfg) => {
