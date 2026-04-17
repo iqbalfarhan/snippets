@@ -196,3 +196,20 @@
     letter-spacing: var(--tracking-normal);
   }
 }
+
+
+@utility grid-res-4 {
+  @apply gap-4 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4;
+}
+
+@utility grid-res-3 {
+  @apply gap-4 lg:grid-cols-2 xl:grid-cols-3;
+}
+
+@utility grid-res-2 {
+  @apply gap-4 xl:grid-cols-2;
+}
+
+@utility grid-res {
+  @apply grid-cols-1 gap-4;
+}
