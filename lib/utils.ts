@@ -1,3 +1,4 @@
+import { InertiaLinkProps } from "@inertiajs/react";
 import { type ClassValue, clsx } from "clsx";
 import dayjs from "dayjs";
 import { toast } from "sonner";
@@ -5,6 +6,10 @@ import { twMerge } from "tailwind-merge";
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
+}
+
+export function toUrl(url: NonNullable<InertiaLinkProps["href"]>): string {
+  return typeof url === "string" ? url : url.url;
 }
 
 export const em = (e: { [key: string]: string }) => {
@@ -193,10 +198,6 @@ export function groupAndSort<T>(
 
 export function strPad(value: number, length: number = 10): string {
   return String(value).padStart(length, "0");
-}
-
-export function parseAddress(data: Address): string {
-  return `Jalan ${data.jalan} No ${data.no} RT ${data.rt}. Kelurahan ${data.kelurahan} Kecamatan ${data.kecamatan} ${data.kota}, ${data.provinsi}`;
 }
 
 export const getPercentage = (number: number, total: number): number => {
