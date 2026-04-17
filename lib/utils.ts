@@ -1,7 +1,7 @@
-import { type ClassValue, clsx } from 'clsx';
-import dayjs from 'dayjs';
-import { toast } from 'sonner';
-import { twMerge } from 'tailwind-merge';
+import { type ClassValue, clsx } from "clsx";
+import dayjs from "dayjs";
+import { toast } from "sonner";
+import { twMerge } from "tailwind-merge";
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -10,16 +10,20 @@ export function cn(...inputs: ClassValue[]) {
 export const em = (e: { [key: string]: string }) => {
   return Object.entries(e)
     .map(([, v]) => v)
-    .join(', ');
+    .join(", ");
 };
 
-export function strLimit(text: string = '', limit: number = 50, end: string = '...'): string {
+export function strLimit(
+  text: string = "",
+  limit: number = 50,
+  end: string = "...",
+): string {
   if (text.length <= limit) return text;
   return text.slice(0, limit - end.length) + end;
 }
 
 export function dateDFY(date: string | Date) {
-  return dayjs(date).format('DD MMMM YYYY');
+  return dayjs(date).format("DD MMMM YYYY");
 }
 
 export function handlePasteScreenshot(callback: (file: File) => void) {
@@ -28,7 +32,7 @@ export function handlePasteScreenshot(callback: (file: File) => void) {
     if (!items) return;
 
     for (const item of items) {
-      if (item.type.startsWith('image')) {
+      if (item.type.startsWith("image")) {
         const file = item.getAsFile();
         if (file) {
           callback(file);
@@ -37,8 +41,8 @@ export function handlePasteScreenshot(callback: (file: File) => void) {
     }
   };
 
-  window.addEventListener('paste', onPaste);
-  return () => window.removeEventListener('paste', onPaste); // biar bisa cleanup
+  window.addEventListener("paste", onPaste);
+  return () => window.removeEventListener("paste", onPaste); // biar bisa cleanup
 }
 
 // cara pakai handlePasteScreenShot
@@ -62,16 +66,18 @@ export function handlePasteScreenshot(callback: (file: File) => void) {
 // }, [article.id]);
 
 export function generateSlug(text: string): string {
-  const slugBase = text.replace(/\//g, '');
-  return slugBase.toLowerCase().replace(/\s+/g, '-');
+  const slugBase = text.replace(/\//g, "");
+  return slugBase.toLowerCase().replace(/\s+/g, "-");
 }
 
 export function generateRandomPassword(): string {
-  const letters = 'abcdefghijklmnopqrstuvwxyz';
-  const digits = '0123456789';
+  const letters = "abcdefghijklmnopqrstuvwxyz";
+  const digits = "0123456789";
 
   const randomChars = (charset: string, length: number): string => {
-    return Array.from({ length }, () => charset.charAt(Math.floor(Math.random() * charset.length))).join('');
+    return Array.from({ length }, () =>
+      charset.charAt(Math.floor(Math.random() * charset.length)),
+    ).join("");
   };
 
   const part1 = randomChars(letters, 4); // \w{4}
@@ -89,17 +95,10 @@ export function copyMarkdownImage(alt: string, url: string) {
     .catch((err) => toast.error(err));
 }
 
-export function capitalizeWords(str: string): string {
-  return str
-    .split(" ")
-    .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
-    .join(" ");
-}
-
 export function formatRupiah(angka: number): string {
-  return new Intl.NumberFormat('id-ID', {
-    style: 'currency',
-    currency: 'IDR',
+  return new Intl.NumberFormat("id-ID", {
+    style: "currency",
+    currency: "IDR",
     minimumFractionDigits: 0,
   }).format(angka);
 }
@@ -114,7 +113,7 @@ export function formatRupiah(angka: number): string {
 
 export function parseRupiah(display: string): number {
   // Remove all non-digit characters (dots, spaces used as thousand separators)
-  const cleaned = display.replace(/\D/g, '');
+  const cleaned = display.replace(/\D/g, "");
   const parsed = parseInt(cleaned, 10);
 
   return isNaN(parsed) ? 0 : parsed;
@@ -123,7 +122,7 @@ export function parseRupiah(display: string): number {
 export function sortData<T>(
   datas: T[],
   key: keyof T,
-  order: 'asc' | 'desc' = 'asc',
+  order: "asc" | "desc" = "asc",
 ): T[] {
   return [...datas].sort((a, b) => {
     const valA = a[key];
@@ -139,9 +138,9 @@ export function sortData<T>(
 
     let result = 0;
 
-    if (typeof valA === 'string' && typeof valB === 'string') {
+    if (typeof valA === "string" && typeof valB === "string") {
       result = valA.localeCompare(valB);
-    } else if (typeof valA === 'number' && typeof valB === 'number') {
+    } else if (typeof valA === "number" && typeof valB === "number") {
       result = valA - valB;
     } else if (valA instanceof Date && valB instanceof Date) {
       result = valA.getTime() - valB.getTime();
@@ -149,7 +148,7 @@ export function sortData<T>(
       result = String(valA).localeCompare(String(valB));
     }
 
-    return order === 'asc' ? result : -result;
+    return order === "asc" ? result : -result;
   });
 }
 
@@ -160,9 +159,9 @@ export function groupBy<T>(
   return datas.reduce(
     (acc, item) => {
       const groupKey =
-        typeof keyOrSelector === 'function'
+        typeof keyOrSelector === "function"
           ? keyOrSelector(item)
-          : String(item[keyOrSelector] ?? 'undefined');
+          : String(item[keyOrSelector] ?? "undefined");
 
       if (!acc[groupKey]) {
         acc[groupKey] = [];
@@ -180,7 +179,7 @@ export function groupAndSort<T>(
   datas: T[],
   groupKey: keyof T,
   sortKey: keyof T,
-  order: 'asc' | 'desc' = 'asc',
+  order: "asc" | "desc" = "asc",
 ): Record<string, T[]> {
   const grouped = groupBy(datas, groupKey);
 
@@ -193,7 +192,7 @@ export function groupAndSort<T>(
 }
 
 export function strPad(value: number, length: number = 10): string {
-  return String(value).padStart(length, '0');
+  return String(value).padStart(length, "0");
 }
 
 export function parseAddress(data: Address): string {
@@ -222,24 +221,24 @@ export function getAverage<T, K extends keyof T>(data: T[], key: K): number {
 
 export function capitalizeWords(str: string): string {
   return str
-    .split(' ')
+    .split(" ")
     .map((word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
-    .join(' ');
+    .join(" ");
 }
 
 export const formatFileSize = (bytes: number) => {
   if (bytes === 0) {
-    return '0 B';
+    return "0 B";
   }
 
-  const units = ['B', 'KB', 'MB', 'GB', 'TB'];
+  const units = ["B", "KB", "MB", "GB", "TB"];
   const i = Math.floor(Math.log(bytes) / Math.log(1024));
 
   return `${(bytes / Math.pow(1024, i)).toFixed(2)} ${units[i]}`;
 };
 
 export const getFileExtension = (filename: string): string => {
-  return filename.split('.').pop()?.toLowerCase() ?? '';
+  return filename.split(".").pop()?.toLowerCase() ?? "";
 };
 
 export function safeAverage<T>(arr: T[], fn: (item: T) => number): number {
@@ -264,41 +263,41 @@ export function removeAtIndexMutable<T>(arr: T[], index: number): T[] {
 
 export function flattenValues(obj: Record<string, any>): string[] {
   return Object.values(obj).flatMap((v) =>
-    v && typeof v === 'object' && !Array.isArray(v)
+    v && typeof v === "object" && !Array.isArray(v)
       ? flattenValues(v)
       : [String(v)],
   );
 }
 
 export function numberPad(num: number, size = 5): string {
-  return num.toString().padStart(size, '0');
+  return num.toString().padStart(size, "0");
 }
 
 export const generatePassword = (): string => {
   const benda = [
-    'buku',
-    'pulpen',
-    'meja',
-    'kursi',
-    'lampu',
-    'dasi',
-    'pensil',
-    'seragam',
-    'sepatu',
-    'pintu',
+    "buku",
+    "pulpen",
+    "meja",
+    "kursi",
+    "lampu",
+    "dasi",
+    "pensil",
+    "seragam",
+    "sepatu",
+    "pintu",
   ];
 
   const warna = [
-    'kuning',
-    'merah',
-    'hijau',
-    'biru',
-    'ungu',
-    'jingga',
-    'putih',
-    'hitam',
-    'coklat',
-    'pink',
+    "kuning",
+    "merah",
+    "hijau",
+    "biru",
+    "ungu",
+    "jingga",
+    "putih",
+    "hitam",
+    "coklat",
+    "pink",
   ];
 
   const randomBenda = benda[Math.floor(Math.random() * benda.length)];
