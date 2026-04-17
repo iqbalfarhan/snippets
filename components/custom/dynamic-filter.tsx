@@ -1,16 +1,15 @@
-import { useFilter } from '@/hooks/use-filter';
-import type { FilterConfig } from '@/types';
-import { X } from 'lucide-react';
-import type { ReactNode } from 'react';
-import SearchInput from './search-input';
-import { Button } from './ui/button';
+import { FilterConfig, useFilter } from "@/hooks/use-filter";
+import { X } from "lucide-react";
+import type { ReactNode } from "react";
+import SearchInput from "./search-input";
+import { Button } from "../ui/button";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from './ui/select';
+} from "../ui/select";
 
 interface DynamicFilterProps<T> {
   data: T[];
@@ -53,11 +52,11 @@ export function DynamicFilter<T extends Record<string, any>>({
 
         <div className="flex items-center gap-2">
           {activeConfigs
-            .filter((cfg) => cfg.type === 'select')
+            .filter((cfg) => cfg.type === "select")
             .map((cfg) => (
               <Select
                 key={cfg.key as string}
-                value={filters[cfg.key as string] || ''}
+                value={filters[cfg.key as string] || ""}
                 onValueChange={(e) =>
                   setFilters((prev) => ({
                     ...prev,
@@ -80,7 +79,7 @@ export function DynamicFilter<T extends Record<string, any>>({
 
           {/* Reset button */}
           {hasActiveFilter && (
-            <Button onClick={reset} variant={'destructive'}>
+            <Button onClick={reset} variant={"destructive"}>
               <X />
               Reset
             </Button>

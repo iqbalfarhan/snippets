@@ -1,4 +1,4 @@
-import SubmitButton from '@/components/submit-button';
+import SubmitButton from "./submit-button";
 import {
   AlertDialog as BaseAlertDialog,
   AlertDialogAction,
@@ -9,9 +9,9 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
   AlertDialogTrigger,
-} from '@/components/ui/alert-dialog';
-import { X } from 'lucide-react';
-import type { ComponentProps, FC, ReactNode } from 'react';
+} from "@/components/ui/alert-dialog";
+import { X } from "lucide-react";
+import type { ComponentProps, FC, ReactNode } from "react";
 
 type Props = ComponentProps<typeof BaseAlertDialog> & {
   title?: string;
@@ -22,8 +22,8 @@ type Props = ComponentProps<typeof BaseAlertDialog> & {
 };
 
 const AlertDialog: FC<Props> = ({
-  title = 'Form dialog',
-  description = 'Form dialog description',
+  title = "Form dialog",
+  description = "Form dialog description",
   trigger,
   loading = false,
   onSubmit,
