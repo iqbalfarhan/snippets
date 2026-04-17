@@ -1,25 +1,34 @@
-import { cn } from '@/lib/utils';
-import { PropsWithChildren } from 'react';
-import { Label } from './ui/label';
+import type { FC, PropsWithChildren } from 'react';
+import { Field, FieldDescription, FieldLabel } from '../ui/field';
 
-type FormControlProps = PropsWithChildren & {
+type Props = PropsWithChildren & {
   label?: string;
   hint?: string;
+  description?: string;
   className?: string;
   required?: boolean;
 };
 
-const FormControl = ({ label, children, className, required, hint }: FormControlProps) => {
+const FormControl: FC<Props> = ({
+  children,
+  label,
+  hint,
+  className,
+  description,
+  required = false,
+}) => {
   return (
-    <Label className={cn('flex flex-col space-y-2', className)}>
-      {label && (
-        <label>
-          {label} {required && <span className="text-destructive">*</span>}
-        </label>
-      )}
+    <Field className={className}>
+      <FieldLabel>
+        <span>
+          {label}
+          {required && <span className="text-red-500"> *</span>}
+        </span>
+        <span className="ml-auto text-muted-foreground text-sm">{hint}</span>
+      </FieldLabel>
       {children}
-      {hint && <p className="flex gap-1 text-xs text-muted-foreground">{hint}</p>}
-    </Label>
+      <FieldDescription>{description}</FieldDescription>
+    </Field>
   );
 };
 
