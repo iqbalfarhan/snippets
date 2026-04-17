@@ -1,170 +1,115 @@
-import React, { forwardRef, InputHTMLAttributes, useEffect, useRef, useState } from 'react';
-import { Input } from './ui/input';
+import { cn, formatRupiah, parseRupiah } from '@/lib/utils';
+import type { ComponentProps } from 'react';
+import { useCallback, useRef, useState } from 'react';
+import {
+  InputGroup,
+  InputGroupAddon,
+  InputGroupInput,
+} from '../ui/input-group';
 
-/**
- * MoneyInput
- * Komponen input uang dengan format lokal Indonesia (default: id-ID, IDR/Rp)
- * - Ketik angka bebas, otomatis diformat dengan pemisah ribuan.
- * - Nilai yang di-pass ke onValueChange adalah number (dalam unit mata uang, bukan sen), contoh: 125000.
- * - Support mata uang tanpa desimal (IDR) maupun dengan desimal (mis. USD) melalui props `decimals`.
- */
-
-type MoneyInputProps = Omit<InputHTMLAttributes<HTMLInputElement>, 'value' | 'onChange'> & {
-  value: number | null;
-  onValueChange: (value: number | null) => void;
-  currency?: string; // default: "IDR"
-  locale?: string; // default: "id-ID"
-  decimals?: number; // default: 0 untuk IDR
-  allowNegative?: boolean; // default: false
-  /**
-   * Jika true, akan tampil style tailwind bawaan komponen (ring, rounded, dll)
-   */
-  styled?: boolean;
+type MoneyInputProps = ComponentProps<typeof InputGroupInput> & {
+  value: number;
+  onValueChange: (value: number) => void;
+  id?: string;
+  name?: string;
+  min?: number;
+  max?: number;
 };
 
-function getSeparators(locale: string) {
-  const example = 1234567.89;
-  const parts = new Intl.NumberFormat(locale).formatToParts(example);
-  const group = parts.find((p) => p.type === 'group')?.value ?? '.';
-  const decimal = parts.find((p) => p.type === 'decimal')?.value ?? ',';
-  return { group, decimal };
-}
+const MoneyInput = ({
+  value,
+  onValueChange,
+  placeholder = '0',
+  disabled = false,
+  id,
+  name,
+  min,
+  max,
+}: MoneyInputProps) => {
+  const inputRef = useRef<HTMLInputElement>(null);
+  const [isFocused, setIsFocused] = useState(false);
+  const [rawValue, setRawValue] = useState('');
 
-function toNumericString(input: string, locale: string, allowNegative: boolean, decimals: number) {
-  const { group, decimal } = getSeparators(locale);
-  // Allow digits, decimal sep, and optional leading minus if allowed
-  let s = input
-    .replace(new RegExp('\\\\s', 'g'), '')
-    .replace(new RegExp('\\' + group, 'g'), '') // remove thousand separators
-    .replace(/[A-Za-z]/g, '') // remove letters
-    .replace(/[^0-9\-" + decimal + "]/g, '');
+  // Derived — no useEffect needed
+  const displayValue = isFocused ? rawValue : formatRupiah(value);
 
-  // Normalize multiple minus signs
-  if (allowNegative) {
-    // keep only leading minus
-    s = s.replace(/-/g, (m, offset) => (offset === 0 ? m : ''));
-  } else {
-    s = s.replace(/-/g, '');
-  }
+  const handleFocus = useCallback(() => {
+    setRawValue(value ? String(value) : '');
+    setIsFocused(true);
+    setTimeout(() => inputRef.current?.select(), 0);
+  }, [value]);
 
-  // Only one decimal separator
-  const firstDec = s.indexOf(decimal);
-  if (firstDec !== -1) {
-    s = s.slice(0, firstDec + 1) + s.slice(firstDec + 1).replace(new RegExp('\\' + decimal, 'g'), '');
-    // Limit decimal places based on decimals parameter
-    if (decimals === 0) {
-      s = s.split(decimal)[0];
-    } else {
-      const parts = s.split(decimal);
-      if (parts[1] && parts[1].length > decimals) {
-        s = parts[0] + decimal + parts[1].slice(0, decimals);
+  const handleBlur = useCallback(() => {
+    setIsFocused(false);
+    const numeric = parseRupiah(rawValue);
+
+    const clamped = Math.min(
+      max ?? Infinity,
+      Math.max(min ?? -Infinity, numeric),
+    );
+
+    onValueChange(clamped);
+  }, [rawValue, min, max, onValueChange]);
+
+  const handleChange = useCallback(
+    (e: React.ChangeEvent<HTMLInputElement>) => {
+      const raw = e.target.value.replace(/[^\d]/g, '');
+      setRawValue(raw);
+      onValueChange(parseRupiah(raw));
+    },
+    [onValueChange],
+  );
+
+  const handleKeyDown = useCallback(
+    (e: React.KeyboardEvent<HTMLInputElement>) => {
+      if (e.key === 'Enter') {
+        inputRef.current?.blur();
       }
-    }
-  }
 
-  // Edge: input is just "-" or just decimal
-  if (s === '-' || s === decimal || s === '-') return s;
+      const allowed = [
+        'ArrowLeft',
+        'ArrowRight',
+        'ArrowUp',
+        'ArrowDown',
+        'Backspace',
+        'Delete',
+        'Tab',
+        'Home',
+        'End',
+      ];
 
-  return s;
-}
+      if (allowed.includes(e.key)) {
+        return;
+      }
 
-function parseToNumber(numericStr: string, locale: string, decimals: number): number | null {
-  if (!numericStr) return null;
-  const { decimal } = getSeparators(locale);
-  let s = numericStr;
-  // Replace locale decimal with dot for JS parse
-  if (decimals > 0) {
-    s = s.replace(decimal, '.');
-  } else {
-    // remove any decimal separator if decimals = 0
-    s = s.split(decimal)[0];
-  }
-  // Handle edge-only minus
-  if (s === '-' || s === '' || s === '.') return null;
-  const n = Number(s);
-  return Number.isFinite(n) ? n : null;
-}
-
-function formatNumber(n: number, locale: string, currency: string, decimals: number) {
-  // Use currency style to include symbol (Rp)
-  const fmt = new Intl.NumberFormat(locale, {
-    style: 'currency',
-    currency,
-    minimumFractionDigits: decimals,
-    maximumFractionDigits: decimals,
-  });
-  return fmt.format(n);
-}
-
-const MoneyInput = forwardRef<HTMLInputElement, MoneyInputProps>(function MoneyInput(
-  {
-    value,
-    onValueChange,
-    currency = 'IDR',
-    locale = 'id-ID',
-    decimals = currency === 'IDR' ? 0 : 2,
-    allowNegative = false,
-    onBlur,
-    onFocus,
-    ...rest
-  },
-  ref,
-) {
-  const [display, setDisplay] = useState<string>(value != null ? formatNumber(value, locale, currency, decimals) : '');
-  const lastEmitted = useRef<number | null>(value ?? null);
-
-  // Keep display synced when value prop changes externally
-  useEffect(() => {
-    if (value !== lastEmitted.current) {
-      setDisplay(value != null ? formatNumber(value, locale, currency, decimals) : '');
-      lastEmitted.current = value ?? null;
-    }
-  }, [value, locale, currency, decimals]);
-
-  const handleChange: React.ChangeEventHandler<HTMLInputElement> = (e) => {
-    const raw = e.target.value;
-    const cleaned = toNumericString(raw, locale, allowNegative, decimals);
-    const num = parseToNumber(cleaned, locale, decimals);
-
-    // Update display with formatted number if possible; otherwise keep cleaned
-    if (num != null) {
-      setDisplay(formatNumber(num, locale, currency, decimals));
-    } else {
-      setDisplay(cleaned);
-    }
-
-    if (num !== lastEmitted.current) {
-      lastEmitted.current = num;
-      onValueChange(num);
-    }
-  };
-
-  const handleBlur: React.FocusEventHandler<HTMLInputElement> = (e) => {
-    // Ensure final formatting
-    const num = parseToNumber(toNumericString(display, locale, allowNegative, decimals), locale, decimals);
-    setDisplay(num != null ? formatNumber(num, locale, currency, decimals) : '');
-    onBlur?.(e);
-  };
-
-  const handleFocus: React.FocusEventHandler<HTMLInputElement> = (e) => {
-    // Optional: select all for quick overwrite
-    e.currentTarget.select();
-    onFocus?.(e);
-  };
+      // Block non-numeric input
+      if (!/[\d.,]/.test(e.key) && !e.metaKey && !e.ctrlKey) {
+        e.preventDefault();
+      }
+    },
+    [],
+  );
 
   return (
-    <Input
-      ref={ref}
-      inputMode={decimals > 0 ? 'decimal' : 'numeric'}
-      autoComplete="off"
-      value={display}
-      onChange={handleChange}
-      onBlur={handleBlur}
-      onFocus={handleFocus}
-      placeholder={formatNumber(0, locale, currency, decimals)}
-      {...rest}
-    />
+    <InputGroup>
+      <InputGroupAddon>Rp</InputGroupAddon>
+      {/* Number input */}
+      <InputGroupInput
+        id={id}
+        name={name}
+        type="text"
+        inputMode="numeric"
+        disabled={disabled}
+        placeholder={placeholder}
+        value={displayValue}
+        onChange={handleChange}
+        onFocus={handleFocus}
+        onBlur={handleBlur}
+        onKeyDown={handleKeyDown}
+        className={cn('font-mono tabular-nums')}
+      />
+    </InputGroup>
   );
-});
+};
 
 export default MoneyInput;
