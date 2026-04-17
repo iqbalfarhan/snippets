@@ -1,25 +1,25 @@
 import {
-  Sheet,
+  Sheet as BaseSheet,
   SheetContent,
   SheetDescription,
   SheetFooter,
   SheetHeader,
   SheetTitle,
   SheetTrigger,
-} from '@/components/ui/sheet';
-import { useIsMobile } from '@/hooks/use-mobile';
-import type { ComponentProps, FC, ReactNode } from 'react';
+} from "@/components/ui/sheet";
+import { useIsMobile } from "@/hooks/use-mobile";
+import type { ComponentProps, FC, ReactNode } from "react";
 
-type Props = ComponentProps<typeof Sheet> & {
+type Props = ComponentProps<typeof BaseSheet> & {
   title?: string;
   description?: string;
   trigger?: ReactNode;
   footer?: ReactNode;
 };
 
-const AppSheet: FC<Props> = ({
-  title = 'Form sheet',
-  description = 'Form sheet description',
+const Sheet: FC<Props> = ({
+  title = "Form sheet",
+  description = "Form sheet description",
   children,
   trigger,
   footer,
@@ -28,9 +28,9 @@ const AppSheet: FC<Props> = ({
   const isMobile = useIsMobile();
 
   return (
-    <Sheet {...props}>
+    <BaseSheet {...props}>
       {trigger && <SheetTrigger asChild>{trigger}</SheetTrigger>}
-      <SheetContent side={isMobile ? 'bottom' : 'right'}>
+      <SheetContent side={isMobile ? "bottom" : "right"}>
         <SheetHeader>
           <SheetTitle>{title}</SheetTitle>
           <SheetDescription>{description}</SheetDescription>
@@ -38,8 +38,8 @@ const AppSheet: FC<Props> = ({
         <div className="space-y-4 px-4 overflow-y-auto">{children}</div>
         {footer && <SheetFooter>{footer}</SheetFooter>}
       </SheetContent>
-    </Sheet>
+    </BaseSheet>
   );
 };
 
-export default AppSheet;
+export default Sheet;
