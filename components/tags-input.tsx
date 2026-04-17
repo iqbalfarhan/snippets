@@ -1,6 +1,7 @@
-import { FC, KeyboardEvent, MouseEvent, useState } from 'react';
-import { Badge } from './ui/badge';
-import { Input } from './ui/input';
+import type { FC, KeyboardEvent, MouseEvent } from 'react';
+import { useState } from 'react';
+import { Badge } from '../ui/badge';
+import { Input } from '../ui/input';
 
 type Props = {
   value?: string[];
@@ -12,6 +13,7 @@ const TagsInput: FC<Props> = ({ value = [], onValueChange }) => {
 
   const addTag = (tag: string) => {
     const newTag = tag.trim();
+
     if (newTag && !value.includes(newTag)) {
       onValueChange?.([...value, newTag]);
     }
@@ -27,6 +29,7 @@ const TagsInput: FC<Props> = ({ value = [], onValueChange }) => {
       addTag(input);
       setInput('');
     }
+
     if (e.key === 'Backspace' && input === '' && value.length > 0) {
       removeTag(value[value.length - 1]);
     }
@@ -42,7 +45,11 @@ const TagsInput: FC<Props> = ({ value = [], onValueChange }) => {
       {value.length > 0 && (
         <div className="flex flex-wrap gap-1">
           {value.map((tag) => (
-            <Badge key={tag} variant="default" className="flex items-center gap-1 pr-1">
+            <Badge
+              key={tag}
+              variant="default"
+              className="flex items-center gap-1 pr-1"
+            >
               <span>{tag}</span>
               <button type="button" onClick={(e) => handleRemoveClick(e, tag)}>
                 ✕
@@ -57,7 +64,7 @@ const TagsInput: FC<Props> = ({ value = [], onValueChange }) => {
         onChange={(e) => setInput(e.target.value)}
         onKeyDown={handleKeyDown}
         placeholder="Tambah tag..."
-        className="min-w-[100px] flex-1 outline-none"
+        className="min-w-25 flex-1 outline-none"
       />
     </div>
   );
