@@ -66,7 +66,7 @@ export function generateSlug(text: string): string {
   return slugBase.toLowerCase().replace(/\s+/g, '-');
 }
 
-export function generatePassword(): string {
+export function generateRandomPassword(): string {
   const letters = 'abcdefghijklmnopqrstuvwxyz';
   const digits = '0123456789';
 
@@ -78,20 +78,6 @@ export function generatePassword(): string {
   const part2 = randomChars(digits, 4); // \d{4}
 
   return part1 + part2;
-}
-
-export function groupBy<T, K extends keyof T>(array: T[], key: K): Record<string, T[]> {
-  return array.reduce(
-    (acc, item) => {
-      const groupKey = String(item[key]);
-      if (!acc[groupKey]) {
-        acc[groupKey] = [];
-      }
-      acc[groupKey].push(item);
-      return acc;
-    },
-    {} as Record<string, T[]>,
-  );
 }
 
 export function copyMarkdownImage(alt: string, url: string) {
@@ -252,7 +238,7 @@ export const formatFileSize = (bytes: number) => {
   return `${(bytes / Math.pow(1024, i)).toFixed(2)} ${units[i]}`;
 };
 
-export const getExtension = (filename: string): string => {
+export const getFileExtension = (filename: string): string => {
   return filename.split('.').pop()?.toLowerCase() ?? '';
 };
 
